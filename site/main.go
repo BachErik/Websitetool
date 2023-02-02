@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -59,10 +58,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintln(w, "File uploaded successfully")
 	/*
-	error := unzipSource(untyped string(guid) + "/site.zip", "")
-    if error != nil {
-        log.Fatal(err)
-    }
+			error := unzipSource(untyped string(guid) + "/site.zip", "")
+		    if error != nil {
+		        log.Fatal(err)
+		    }
 	*/
 }
 
