@@ -5,30 +5,38 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Generate a new GUID
-	guid := make([]byte, 16)
-	_, err := io.ReadFull(rand.Reader, guid)
+	fmt.Println(">GUID")
+	guid := uuid.New()
+	_, err := io.ReadFull(rand.Reader, []byte(guid.String()))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	folderName := fmt.Sprintf("%x", guid)
+	fmt.Println("GUID>")
 
 	// Create a folder with the GUID as its name
+	fmt.Println(">folder-GUID")
 	err = os.Mkdir(folderName, 0700)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("folder-GUID>")
 
 	// Upload the file to the folder
+	fmt.Println(">file to folder")
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -49,88 +57,95 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("file to folder>")
 
 	// Set the GUID as a cookie
+	fmt.Println(">GUID-cookie")
 	http.SetCookie(w, &http.Cookie{
 		Name:  "GUID",
 		Value: folderName,
 	})
-
+	fmt.Println("GUID-cookie>")
 	fmt.Fprintln(w, "File uploaded successfully")
-	/*
-			error := unzipSource(untyped string(guid) + "/site.zip", "")
-		    if error != nil {
-		        log.Fatal(err)
-		    }
-	*/
+	fmt.Println(">unzip")
+	err = os.Mkdir(folderName + "/unzipped", 0700)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	error := Unzip(guid.String()+"/site.zip", guid.String()+"/unzipped")
+	if error != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("unzip>")
 }
 
 func showUploadForm(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "upload.html")
 }
 
-func unzipSource(source, destination string) error {
-	// 1. Open the zip file
-	reader, err := zip.OpenReader(source)
-	if err != nil {
-		return err
-	}
-	defer reader.Close()
+func Unzip(src, dest string) error {
+    r, err := zip.OpenReader(src)
+    if err != nil {
+        return err
+    }
+    defer func() {
+        if err := r.Close(); err != nil {
+            panic(err)
+        }
+    }()
 
-	// 2. Get the absolute destination path
-	destination, err = filepath.Abs(destination)
-	if err != nil {
-		return err
-	}
+    os.MkdirAll(dest, 0755)
 
-	// 3. Iterate over zip files inside the archive and unzip each of them
-	for _, f := range reader.File {
-		err := unzipFile(f, destination)
-		if err != nil {
-			return err
-		}
-	}
+    // Closure to address file descriptors issue with all the deferred .Close() methods
+    extractAndWriteFile := func(f *zip.File) error {
+        rc, err := f.Open()
+        if err != nil {
+            return err
+        }
+        defer func() {
+            if err := rc.Close(); err != nil {
+                panic(err)
+            }
+        }()
 
-	return nil
-}
+        path := filepath.Join(dest, f.Name)
 
-func unzipFile(f *zip.File, destination string) error {
-	// 4. Check if file paths are not vulnerable to Zip Slip
-	filePath := filepath.Join(destination, f.Name)
-	if !strings.HasPrefix(filePath, filepath.Clean(destination)+string(os.PathSeparator)) {
-		return fmt.Errorf("invalid file path: %s", filePath)
-	}
+        // Check for ZipSlip (Directory traversal)
+        if !strings.HasPrefix(path, filepath.Clean(dest) + string(os.PathSeparator)) {
+            return fmt.Errorf("illegal file path: %s", path)
+        }
 
-	// 5. Create directory tree
-	if f.FileInfo().IsDir() {
-		if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
-			return err
-		}
-		return nil
-	}
+        if f.FileInfo().IsDir() {
+            os.MkdirAll(path, f.Mode())
+        } else {
+            os.MkdirAll(filepath.Dir(path), f.Mode())
+            f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+            if err != nil {
+                return err
+            }
+            defer func() {
+                if err := f.Close(); err != nil {
+                    panic(err)
+                }
+            }()
 
-	if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-		return err
-	}
+            _, err = io.Copy(f, rc)
+            if err != nil {
+                return err
+            }
+        }
+        return nil
+    }
 
-	// 6. Create a destination file for unzipped content
-	destinationFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-	if err != nil {
-		return err
-	}
-	defer destinationFile.Close()
+    for _, f := range r.File {
+        err := extractAndWriteFile(f)
+        if err != nil {
+            return err
+        }
+    }
 
-	// 7. Unzip the content of a file and copy it to the destination file
-	zippedFile, err := f.Open()
-	if err != nil {
-		return err
-	}
-	defer zippedFile.Close()
-
-	if _, err := io.Copy(destinationFile, zippedFile); err != nil {
-		return err
-	}
-	return nil
+    return nil
 }
 
 func main() {
