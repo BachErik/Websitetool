@@ -23,12 +23,11 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	folderName := guid.String()
 	fmt.Println("GUID>")
 
 	// Create a folder with the GUID as its name
 	fmt.Println(">folder-GUID")
-	err = os.Mkdir(folderName, 0700)
+	err = os.Mkdir(guid.String(), 0700)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -44,7 +43,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	filePath := fmt.Sprintf("%s/%s", folderName, header.Filename)
+	filePath := fmt.Sprintf("%s/%s", guid.String(), header.Filename)
 	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,12 +62,14 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(">GUID-cookie")
 	http.SetCookie(w, &http.Cookie{
 		Name:  "GUID",
-		Value: folderName,
+		Value: guid.String(),
 	})
 	fmt.Println("GUID-cookie>")
-	fmt.Fprintln(w, "File uploaded successfully")
+	// fmt.Fprintln(w, "File uploaded successfully")
+
+	// Unzip zip
 	fmt.Println(">unzip")
-	err = os.Mkdir(folderName+"/unzipped", 0700)
+	err = os.Mkdir(guid.String()+"/unzipped", 0700)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -80,10 +81,32 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	fmt.Println("unzip>")
+
+	// Show Index
+	// fmt.Fprintln(w, "File unzipped successfully")
+
+	showIndexForm(w, r)
 }
 
 func showUploadForm(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "upload.html")
+}
+
+func showIndexForm(w http.ResponseWriter, r *http.Request) {
+	// http.ServeFile(w, r, "index.html")
+	cookie, err := r.Cookie("GUID")
+	if err != nil {
+		http.ServeFile(w, r, "upload.html")
+		fmt.Println(err)
+	}
+	fmt.Println(cookie)
+	fmt.Println(cookie)
+	fmt.Println(cookie)
+	fmt.Println(cookie)
+	fmt.Println(cookie)
+	fmt.Println(cookie)
+
+	http.ServeFile(w, r, "index.html")
 }
 
 func unzip(src, dest string) error {
@@ -131,6 +154,7 @@ func unzip(src, dest string) error {
 }
 
 func main() {
+	http.HandleFunc("/index", showIndexForm)
 	http.HandleFunc("/upload", uploadFile)
 	http.HandleFunc("/", showUploadForm)
 	http.ListenAndServe(":8080", nil)
