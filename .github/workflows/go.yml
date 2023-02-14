@@ -1,4 +1,4 @@
-# This workflow will build a golang project
+# This workflow will build a golang project and create a new release
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
 name: Go
@@ -11,13 +11,13 @@ on:
 
 jobs:
 
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v2
       with:
         go-version: 1.19
 
@@ -27,3 +27,21 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: Get current release tag
+      id: get_current_release_tag
+      run: echo "::set-output name=tag::$(git tag | tail -1)"
+
+    - name: Bump release number
+      id: bump_release_number
+      run: echo "::set-output name=new_tag::$(echo ${{ steps.get_current_release_tag.outputs.tag }} | awk -F '.' '{print $1"."$2"."$3+1}')"
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.bump_release_number.outputs.new_tag }}
+        release_name: Release ${{ steps.bump_release_number.outputs.new_tag }}
+        body: |
+          This is an automated release.
