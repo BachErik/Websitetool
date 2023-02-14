@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -24,6 +26,7 @@ jobs:
         run: go test -v ./...
         
       - name: Update release number
+        if: github.event_name == 'release'
         uses: actions/github-script@v4
         with:
           script: |
@@ -47,6 +50,7 @@ jobs:
           MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
       - name: Bump version and create release
+        if: github.event_name == 'release'
         id: create_release
         uses: ncipollo/release-action@v1
         env:
@@ -58,7 +62,7 @@ jobs:
           prerelease: false
 
       - name: Checkout tag
+        if: github.event_name == 'release'
         uses: actions/checkout@v2
         with:
           ref: ${{ env.VERSION }}
-
