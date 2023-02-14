@@ -46,7 +46,7 @@ jobs:
       - name: Go Release Binaries Large Disk
         uses: wangyoucao577/go-release-action@074de155de851f31c28201ff48135d4ecea0fb6c # v1.22
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           release_tag: dev
@@ -62,7 +62,7 @@ jobs:
       - name: Go Release Binaries Normal Volume Size
         uses: wangyoucao577/go-release-action@074de155de851f31c28201ff48135d4ecea0fb6c # v1.22
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           release_tag: dev
@@ -95,7 +95,7 @@ jobs:
       - name: Go Release Binaries Large Disk
         uses: wangyoucao577/go-release-action@074de155de851f31c28201ff48135d4ecea0fb6c # v1.22
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           release_tag: dev
@@ -111,7 +111,7 @@ jobs:
       - name: Go Release Binaries Normal Volume Size
         uses: wangyoucao577/go-release-action@074de155de851f31c28201ff48135d4ecea0fb6c # v1.22
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           release_tag: dev
