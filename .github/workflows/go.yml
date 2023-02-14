@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-  release:
-    types: [created]
 
 jobs:
   build:
@@ -24,13 +22,27 @@ jobs:
 
       - name: Test
         run: go test -v ./...
-        
+
+      - name: Bump version and create release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: ${{ github.ref }}
+          title: Release ${{ github.ref }}
+          prerelease: false
+
+      - name: Checkout tag
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
       - name: Update release number
-        if: github.event_name == 'release'
         uses: actions/github-script@v4
         with:
           script: |
-            const newVersion = '${{ env.VERSION }}'
+            const newVersion = '${{ github.ref }}'
             const currentVersion = context.payload.release.tag_name
             const regex = /\d+\.\d+\.\K(\d+)/
             const newReleaseNumber = currentVersion.match(regex) ? currentVersion.replace(regex, m => parseInt(m) + 1) : newVersion
@@ -45,24 +57,3 @@ jobs:
               draft: false,
               target_commitish: context.payload.release.target_commitish,
             })
-        env:
-          VERSION: ${{ env.VERSION }}
-          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-
-      - name: Bump version and create release
-        if: github.event_name == 'release'
-        id: create_release
-        uses: ncipollo/release-action@v1
-        env:
-          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          version: ${{ env.VERSION }}
-          title: Release ${{ env.VERSION }}
-          tag: ${{ env.VERSION }}
-          prerelease: false
-
-      - name: Checkout tag
-        if: github.event_name == 'release'
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ env.VERSION }}
