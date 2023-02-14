@@ -1,20 +1,21 @@
 # .github/workflows/release.yaml
--bla
-  on:
-    push:
-      branches:
-        - '*'
-      tags:
-        - '*'
+name: Hopflly works
 
-  jobs:
-    release-linux-amd64:
-      name: release linux/amd64
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.35
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: linux
-          goarch: amd64
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+
+jobs:
+  release-linux-amd64:
+    name: release linux/amd64
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: wangyoucao577/go-release-action@v1.35
+      with:
+        github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+        goos: linux
+        goarch: amd64
