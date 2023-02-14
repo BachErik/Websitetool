@@ -22,23 +22,7 @@ jobs:
 
       - name: Test
         run: go test -v ./...
-
-      - name: Bump version and create release
-        id: create_release
-        uses: ncipollo/release-action@v1
-        env:
-          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          version: ${{ env.VERSION }}
-          title: Release ${{ env.VERSION }}
-          tag: ${{ env.VERSION }}
-          prerelease: false
-
-      - name: Checkout tag
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ env.VERSION }}
-
+        
       - name: Update release number
         uses: actions/github-script@v4
         with:
@@ -61,3 +45,20 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+
+      - name: Bump version and create release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          version: ${{ env.VERSION }}
+          title: Release ${{ env.VERSION }}
+          tag: ${{ env.VERSION }}
+          prerelease: false
+
+      - name: Checkout tag
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.VERSION }}
+
