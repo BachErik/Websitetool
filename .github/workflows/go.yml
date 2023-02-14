@@ -20,7 +20,7 @@ jobs:
 
       - name: Bump version and create release
         id: create_release
-        uses: ncipollo/release-action@v2
+        uses: ncipollo/release-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
