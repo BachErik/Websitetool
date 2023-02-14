@@ -8,19 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Build and test
-        run: |
-          # Build and test your project here
-          go build -v ./...
-          go test -v ./...
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.x'
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
 
       - name: Bump version and create release
         id: create_release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -28,25 +33,31 @@ jobs:
           title: Release ${{ env.VERSION }}
           tag: ${{ env.VERSION }}
           prerelease: false
-          
-      - name: Update release number
-        run: |
-          OLD_TAG=$(git tag | tail -n 1)
-          NEW_TAG=$(echo $OLD_TAG | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-        if: always()
-      - name: Update release notes
-        uses: peter-evans/create-pull-request@v3
-        with:
-          commit-message: Update release notes for ${{ env.VERSION }}
-          title: Update release notes for ${{ env.VERSION }}
-          labels: automated
-          branch: release-notes/${{ env.VERSION }}
-          base: main
-          body: |
-            ## Changes
-            List your changes here.
 
-            ## Instructions
-            Describe how to install and use your project here.
+      - name: Checkout tag
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.VERSION }}
+
+      - name: Update release number
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const newVersion = '${{ env.VERSION }}'
+            const currentVersion = context.payload.release.tag_name
+            const regex = /\d+\.\d+\.\K(\d+)/
+            const newReleaseNumber = currentVersion.match(regex) ? currentVersion.replace(regex, m => parseInt(m) + 1) : newVersion
+            github.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              tag_name: context.payload.release.tag_name,
+              name: context.payload.release.name,
+              body: context.payload.release.body,
+              prerelease: context.payload.release.prerelease,
+              draft: false,
+              target_commitish: context.payload.release.target_commitish,
+            })
+        env:
+          VERSION: ${{ env.VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
