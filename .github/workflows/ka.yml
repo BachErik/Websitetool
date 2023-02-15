@@ -21,18 +21,19 @@ jobs:
         id: get_tag
         run: echo "::set-output name=tag::$(git describe --abbrev=0)"
 
-      - name: Bump version
-        id: version
-        uses: bahmutov/auto-semantic-version@v1
+      - name: Determine next version
+        id: next_version
+        uses: anothrNick/github-tag-action@v1.18
         with:
-          current_tag: ${{ steps.get_tag.outputs.tag }}
-          commit_message: This is an automated release!
-          prerelease_prefix: rc
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+          tag_name: v${{ steps.get_tag.outputs.tag }}
+          version_prefix: v
+          tag_prefix: v
 
       - name: Build and release
         id: build_release
         uses: wangyoucao577/go-release-action@v1.35
         with:
-          tag: ${{ steps.version.outputs.version }}
-          title: Release ${{ steps.version.outputs.version }}
+          tag: ${{ steps.next_version.outputs.tag }}
+          title: Release ${{ steps.next_version.outputs.tag }}
           token: ${{ secrets.MY_GITHUB_TOKEN }}
