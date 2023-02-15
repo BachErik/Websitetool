@@ -27,6 +27,19 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o myapp-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o myapp-windows-amd64.exe main.go
 
+      # Get the latest tag
+      - name: Get latest tag
+        id: get_latest_tag
+        run: echo ::set-output name=tag::$(git describe --abbrev=0 --tags)
+
+      # Calculate next tag
+      - name: Calculate next tag
+        id: calculate_next_tag
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ steps.get_latest_tag.outputs.tag }}"
+          next_patch=$((patch+1))
+          echo ::set-output name=next_tag::"$major.$minor.$next_patch"
+
       # Create a tag for the release
       - name: Create tag
         id: create_tag
@@ -34,13 +47,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
+          tag_name: ${{ steps.calculate_next_tag.outputs.next_tag }}
+          release_name: Release ${{ steps.calculate_next_tag.outputs.next_tag }}
           body: This is an automated release for the latest changes.
 
       # Upload the binaries as release assets
       - name: Upload release assets
-        id: upload-release-assets
+        id: upload-release-assets-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -51,6 +64,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
+        id: upload-release-assets-darwin
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -61,6 +75,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
+        id: upload-release-assets-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
