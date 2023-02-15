@@ -154,6 +154,7 @@ func unzip(src, dest string) error {
 }
 
 func main() {
+	fmt.Println("Hello :D")
 	http.HandleFunc("/index", showIndexForm)
 	http.HandleFunc("/upload", uploadFile)
 	http.HandleFunc("/", showUploadForm)
