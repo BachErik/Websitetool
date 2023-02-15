@@ -26,7 +26,8 @@ jobs:
         uses: bahmutov/auto-semantic-version@v1
         with:
           current_tag: ${{ steps.get_tag.outputs.tag }}
-          commit_message: chore(release): v${{ steps.next_version.outputs.version }}
+          commit_message: This is an automated release!
+          chore(release): v${{ steps.next_version.outputs.version }}
           prerelease_prefix: rc
 
       - name: Build and release
