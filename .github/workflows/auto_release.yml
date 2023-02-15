@@ -26,20 +26,6 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o myapp-linux-amd64 main.go
           GOOS=darwin GOARCH=amd64 go build -o myapp-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o myapp-windows-amd64.exe main.go
-
-      # Get the current version
-      - name: Get current version
-        id: get_current_version
-        run: echo ::set-output name=current_version::$(git describe --abbrev=0)
-
-      # Parse current version and increment the patch version
-      - name: Increment patch version
-        id: increment_patch_version
-        run: |
-          current_version=$(/bin/bash -c 'echo ${{ steps.get_current_version.outputs.current_version }}')
-          new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          echo ::set-output name=new_version::$new_version
-
       # Create a tag for the release
       - name: Create tag
         id: create_tag
@@ -47,13 +33,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.increment_patch_version.outputs.new_version }}
-          release_name: Release ${{ steps.increment_patch_version.outputs.new_version }}
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
           body: This is an automated release for the latest changes.
 
       # Upload the binaries as release assets
       - name: Upload release assets
-        id: upload_release_assets
+        id: upload-release-assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
