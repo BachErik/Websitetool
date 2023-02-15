@@ -20,10 +20,15 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
-    # Build the binaries
-    - name: Build binaries
+    # Build and upload the binaries
+    - name: Build and upload binaries
+      id: build
       run: |
-        go build -o myapp main.go
+        for os in windows linux darwin; do
+          env GOOS=$os GOARCH=amd64 go build -o myapp-$os-amd64 main.go
+          echo "::set-output name=myapp-$os-amd64::myapp-$os-amd64"
+        done
+      shell: bash
 
     # Create a tag for the release
     - name: Create tag
@@ -34,7 +39,7 @@ jobs:
       with:
         tag_name: v1.0.0
         release_name: Release v1.0.0
-        body: This is the first release of myapp
+        body: This is a automated release for the latest changes.
 
     # Upload the binaries as release assets
     - name: Upload release assets
@@ -44,6 +49,12 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_tag.outputs.upload_url }}
-        asset_path: ./myapp
-        asset_name: myapp
+        asset_path: |
+          ${{ steps.build.outputs.myapp-windows-amd64 }}
+          ${{ steps.build.outputs.myapp-linux-amd64 }}
+          ${{ steps.build.outputs.myapp-darwin-amd64 }}
+        asset_name: |
+          myapp-windows-amd64.exe
+          myapp-linux-amd64
+          myapp-darwin-amd64
         asset_content_type: application/octet-stream
