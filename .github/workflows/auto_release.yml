@@ -27,18 +27,18 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o myapp-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o myapp-windows-amd64.exe main.go
 
-      # Get the latest tag
-      - name: Get latest tag
-        id: get_latest_tag
-        run: echo ::set-output name=tag::$(git describe --abbrev=0 --tags)
+      # Get the current version
+      - name: Get current version
+        id: get_current_version
+        run: echo ::set-output name=current_version::$(git describe --abbrev=0)
 
-      # Calculate next tag
-      - name: Calculate next tag
-        id: calculate_next_tag
+      # Parse current version and increment the patch version
+      - name: Increment patch version
+        id: increment_patch_version
         run: |
-          IFS='.' read -r major minor patch <<< "${{ steps.get_latest_tag.outputs.tag }}"
-          next_patch=$((patch+1))
-          echo ::set-output name=next_tag::"$major.$minor.$next_patch"
+          current_version=$(/bin/bash -c 'echo ${{ steps.get_current_version.outputs.current_version }}')
+          new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo ::set-output name=new_version::$new_version
 
       # Create a tag for the release
       - name: Create tag
@@ -47,13 +47,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.calculate_next_tag.outputs.next_tag }}
-          release_name: Release ${{ steps.calculate_next_tag.outputs.next_tag }}
+          tag_name: ${{ steps.increment_patch_version.outputs.new_version }}
+          release_name: Release ${{ steps.increment_patch_version.outputs.new_version }}
           body: This is an automated release for the latest changes.
 
       # Upload the binaries as release assets
       - name: Upload release assets
-        id: upload-release-assets-linux
+        id: upload_release_assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -64,7 +64,6 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
-        id: upload-release-assets-darwin
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -75,7 +74,6 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
-        id: upload-release-assets-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
