@@ -15,7 +15,7 @@ jobs:
 
       - name: Get current version
         run: |
-          VERSION=$(grep -oP 'v\d+\.\d+\.\K\d+' <<< "$VERSION")
+          VERSION=$(grep -oP 'v\d+\.\d+\.\K\d+' <<< $VERSION)
           VERSION=$((VERSION + 1))
           NEW_VERSION="v${{ env.VERSION }}"
           echo "New version: $NEW_VERSION"
