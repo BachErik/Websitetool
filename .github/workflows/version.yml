@@ -20,4 +20,6 @@ jobs:
         # NEW_VERSION="v${{ env.VERSION }}"
         # echo "New version: $NEW_VERSION"
         # echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
-        run: echo "$VERSION"
+        env:
+          Test: 'Hallo ich bin dumm'
+        run: echo "Das stimmt --> $Test"
