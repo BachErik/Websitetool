@@ -1,0 +1,28 @@
+name: Inkrementiere Versionsnummer bei Push in Main-Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  increment-version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Lese aktuelle VERSION aus
+      id: read-version
+      run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
+
+    - name: Inkrementiere Z-Komponente der VERSION
+      id: increment-version
+      env:
+        VERSION: ${{ steps.read-version.outputs.version }}
+      run: |
+        echo "Aktuelle VERSION: $VERSION"
+        MAJOR=$(echo $VERSION | cut -c2)
+        MINOR=$(echo $VERSION | cut -d. -f2)
+        PATCH=$(echo $VERSION | cut -d. -f3)
+        NEW_PATCH=$((PATCH + 1))
+        NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+        echo "Neue VERSION: $NEW_VERSION"
+        echo "::set-output name=new_version::${NEW_VERSION}"
