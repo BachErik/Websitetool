@@ -15,7 +15,7 @@ jobs:
         env:
           OLD: ${{ secrets.VERSION }}
         run: |
-          echo '{"version": "$OLD"}' > package.json
+          echo "{\"version\": \"$OLD\"}" > package.json
           VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' ./package.json)
           echo "::set-output name=current-version::$VERSION"
         id: get_version
