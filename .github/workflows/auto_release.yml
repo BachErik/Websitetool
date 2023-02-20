@@ -33,8 +33,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
+          tag_name: ${{ vars.VERSION }}
+          release_name: Release ${{ vars.VERSION }}
           body: This is an automated release for the latest changes.
 
       # Upload the binaries as release assets
@@ -68,3 +68,14 @@ jobs:
           asset_path: ./myapp-windows-amd64.exe
           asset_name: myapp-windows-amd64.exe
           asset_content_type: application/octet-stream
+
+      # Update Release Variable to the next newer one
+      - name: Update variable
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        run: |
+          curl -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/BachErik/Websitetool/actions/variables/VERSION \
+            -d '{"encrypted_value":"'"$(echo -n Test | base64)"'"}'
