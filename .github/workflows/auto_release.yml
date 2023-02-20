@@ -23,9 +23,9 @@ jobs:
       # Build the binaries
       - name: Build binaries
         run: |
-          GOOS=linux GOARCH=amd64 go build -o myapp-linux-amd64 main.go
-          GOOS=darwin GOARCH=amd64 go build -o myapp-darwin-amd64 main.go
-          GOOS=windows GOARCH=amd64 go build -o myapp-windows-amd64.exe main.go
+          GOOS=linux GOARCH=amd64 go build -o Websitetool-linux-amd64 main.go
+          GOOS=darwin GOARCH=amd64 go build -o Websitetool-darwin-amd64 main.go
+          GOOS=windows GOARCH=amd64 go build -o Websitetool-windows-amd64.exe main.go
       # Create a tag for the release
       - name: Create tag
         id: create_tag
@@ -45,8 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_tag.outputs.upload_url }}
-          asset_path: ./myapp-linux-amd64
-          asset_name: myapp-linux-amd64
+          asset_path: ./Websitetool-linux-amd64
+          asset_name: Websitetool-linux-amd64
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
@@ -55,8 +55,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_tag.outputs.upload_url }}
-          asset_path: ./myapp-darwin-amd64
-          asset_name: myapp-darwin-amd64
+          asset_path: ./Websitetool-darwin-amd64
+          asset_name: Websitetool-darwin-amd64
           asset_content_type: application/octet-stream
 
       - name: Upload release assets
@@ -65,8 +65,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_tag.outputs.upload_url }}
-          asset_path: ./myapp-windows-amd64.exe
-          asset_name: myapp-windows-amd64.exe
+          asset_path: ./Websitetool-windows-amd64.exe
+          asset_name: Websitetool-windows-amd64.exe
           asset_content_type: application/octet-stream
 
       # Update Release Variable to the next newer one
