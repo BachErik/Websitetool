@@ -37,7 +37,7 @@ jobs:
         with:
           tag_name: ${{ vars.VERSION }}
           release_name: Release ${{ vars.VERSION }}
-          body: "# This is an automated release for the latest changes. \n ## Whats changed? \n $COMMIT \n ## Deskription: \n $DESKRIP"
+          body: "# This is an automated release for the latest changes. \n ## Whats changed? \n ${{ env.COMMIT }} \n ## Deskription: \n ${{ env.DESKRIP }}"
 
       # Upload the binaries as release assets
       - name: Upload release assets
