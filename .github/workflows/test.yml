@@ -12,10 +12,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Get current version
-        env: 
+        env:
           OLD: ${{ secrets.VERSION }}
         run: |
-          VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' $OLD)
+          echo '{"version": "$OLD"}' > package.json
+          VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' ./package.json)
           echo "::set-output name=current-version::$VERSION"
         id: get_version
       - name: Increment version
