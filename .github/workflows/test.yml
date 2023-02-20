@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get current version
         run: |
-          echo '{"version": "${{ secrets.VERSION }}"}' > package.json
+          echo '{"version": ${{ secrets.VERSION }}}' > package.json
           VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' ./package.json)
           echo "::set-output name=current-version::$VERSION"
         id: get_version
