@@ -22,4 +22,4 @@ jobs:
         # echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
         env:
           Test: 'Hallo ich bin dumm'
-        run: echo ${{ variables.VERSION }}
+        run: echo ${{ variable.VERSION }}
