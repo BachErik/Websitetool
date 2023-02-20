@@ -14,8 +14,8 @@ jobs:
       - name: Get current version
         run: |
           echo '{"version": ${{ secrets.VERSION }}}' > package.json
-          VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' ./package.json)
-          echo "::set-output name=current-version::$VERSION"
+          # VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' ./package.json)
+          # echo "::set-output name=current-version::$VERSION"
         id: get_version
       - name: Increment version
         run: |
