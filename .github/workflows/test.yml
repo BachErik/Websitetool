@@ -1,0 +1,31 @@
+name: Increment Version Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  increment-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Get current version
+        env: 
+          OLD: ${{ secrets.VERSION }}
+        run: |
+          VERSION=$(grep -oP '(?<=version:\sv)\d+\.\d+\.\d+' $OLD)
+          echo "::set-output name=current-version::$VERSION"
+        id: get_version
+      - name: Increment version
+        run: |
+          VERSION=$(echo ${{ steps.get_version.outputs.current-version }} | sed 's/\./ /g')
+          VERSION=($VERSION)
+          NEW_VERSION="v${VERSION[0]}.${VERSION[1]}.${((VERSION[2]+1))}"
+          echo "::set-output name=new-version::$NEW_VERSION"
+        id: increment_version
+      - name: Use new version
+        run: |
+          echo "New version: ${{ steps.increment_version.outputs.new-version }}"
+          # Verwende die aktualisierte Versionsnummer für die nächsten Schritte des Workflows
