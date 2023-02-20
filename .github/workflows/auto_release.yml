@@ -70,12 +70,4 @@ jobs:
           asset_content_type: application/octet-stream
 
       # Update Release Variable to the next newer one
-      - name: Update variable
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        run: |
-          curl -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            https://api.github.com/repos/BachErik/Websitetool/actions/variables/VERSION \
-            -d '{"encrypted_value":"'"$(echo -n Test | base64)"'"}'
+      # - name: Update variable
