@@ -1,4 +1,4 @@
-name: Go Release Binaries
+name: Buld Go Release Binaries
 
 on:
   push:
