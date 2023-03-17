@@ -1,4 +1,4 @@
-name: Buld Go Release Binaries
+name: Go Release Binaries
 
 on:
   push:
@@ -26,3 +26,51 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o Websitetool-linux-amd64 main.go
           GOOS=darwin GOARCH=amd64 go build -o Websitetool-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o Websitetool-windows-amd64.exe main.go
+      # Create a tag for the release
+      - name: Create tag
+        id: create_tag
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          COMMIT: "Cooming soon"
+          DESKRIP: "I still have to add this feature. So it will come when I feel like working further on the GitHub workflow, because it's not really easy."
+        with:
+          tag_name: ${{ vars.VERSION }}
+          release_name: Release ${{ vars.VERSION }}
+          body: "# This is an automated release for the latest changes. \n ## Whats changed? \n ${{ env.COMMIT }} \n ## Deskription: \n ${{ env.DESKRIP }}"
+
+      # Upload the binaries as release assets
+      - name: Upload release assets
+        id: upload-release-assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          asset_path: ./Websitetool-linux-amd64
+          asset_name: Websitetool-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          asset_path: ./Websitetool-darwin-amd64
+          asset_name: Websitetool-darwin-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          asset_path: ./Websitetool-windows-amd64.exe
+          asset_name: Websitetool-windows-amd64.exe
+          asset_content_type: application/octet-stream
+
+      # Update Release Variable to the next newer one
+      - name: Update variable
+      
