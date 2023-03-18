@@ -19,6 +19,7 @@ jobs:
         with:
           config-name: release-drafter.yml
           tag: ${{ vars.VERSION }}
+          version: ${{ vars.VERSION }}
           prerelease: ${{ vars.PRERELEASE }}
 
       - name: Setup Go
