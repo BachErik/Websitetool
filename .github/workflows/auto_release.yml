@@ -14,17 +14,11 @@ jobs:
         with:
           fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
 
-      - name: 'Get Previous tag'
-        id: latest_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
-
       - name: Generate release notes
         id: release_notes
         uses: release-drafter/release-drafter@v5.21.1
         with:
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          token: ${{ secrets.GrapheQL }}
           config-path: .github/release-drafter.yml
 
       - name: Create Release
@@ -34,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           tag_name: ${{ vars.VERSION }}
-          release_name: Release ${{ steps.latest_tag.outputs.tag }}
+          release_name: Release ${{ vars.VERSION }}
           body: |
             ${{ steps.release_notes.outputs.changes }}
           draft: false
