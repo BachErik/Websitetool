@@ -8,6 +8,15 @@ env:
   GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
 jobs:
+  get-latest-tag:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+        - name: Get latest tag
+          id: latest_tag
+          run: echo ::set-output name=tag::$(git describe --abbrev=0 --tags)
+
   build:
     runs-on: ubuntu-latest
 
@@ -77,12 +86,12 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1.0.1
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.create_tag.outputs.tag_name }}
-          release_name: ${{ steps.create_tag.outputs.tag_name }}
+          tag_name: ${{ steps.latest_tag.outputs.tag }}
+          release_name: ${{ steps.latest_tag.outputs.tag }}
           body: ${{ steps.release_notes.outputs.changes }}
           draft: false
           prerelease: false
