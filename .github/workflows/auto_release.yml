@@ -74,28 +74,28 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Generate release notes
-      id: release_notes
-      uses: release-drafter/release-drafter@v5.21.1
-      with:
-        token: ${{ secrets.MY_GITHUB_TOKEN }}
-        config-path: .github/release-drafter.yml
-      # Set the output for the release notes
-      # This will be used as the release description
-      # in the next step
-      outputs:
-        changes: ${{ steps.release_notes.outputs.changes }}
+        id: release_notes
+        uses: release-drafter/release-drafter@v5.21.1
+        with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          config-path: .github/release-drafter.yml
+        # Set the output for the release notes
+        # This will be used as the release description
+        # in the next step
+        outputs:
+          changes: ${{ steps.release_notes.outputs.changes }}
 
       - name: Create release
-      id: create_release
-      uses: actions/create-release@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-      with:
-        # Set the tag_name to the output value of the create_tag step
-        tag_name: ${{ steps.create_tag.outputs.tag_name }}
-        # Set the release_name to the output value of the create_tag step
-        release_name: ${{ steps.create_tag.outputs.tag_name }}
-        # Set the body to the output value of the release_notes step
-        body: ${{ steps.release_notes.outputs.changes }}
-        draft: false
-        prerelease: false
+        id: create_release
+        uses: actions/create-release@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          # Set the tag_name to the output value of the create_tag step
+          tag_name: ${{ steps.create_tag.outputs.tag_name }}
+          # Set the release_name to the output value of the create_tag step
+          release_name: ${{ steps.create_tag.outputs.tag_name }}
+          # Set the body to the output value of the release_notes step
+          body: ${{ steps.release_notes.outputs.changes }}
+          draft: false
+          prerelease: false
