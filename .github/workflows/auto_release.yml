@@ -18,19 +18,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GrapheQL }}
         with:
           config-name: release-drafter.yml
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ vars.VERSION }}
-          release_name: Release ${{ vars.VERSION }}
-          body: |
-            ${{ steps.release_notes.outputs.changes }}
-          draft: false
-          prerelease: false
+          tag: ${{ vars.VERSION }}
+          prerelease: ${{ vars.PRERELEASE }}
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -48,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.release_notes.outputs.upload_url }}
           asset_path: ./Websitetool-linux-amd64
           asset_name: Websitetool-linux-amd64
           asset_content_type: application/octet-stream
@@ -58,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.release_notes.outputs.upload_url }}
           asset_path: ./Websitetool-darwin-amd64
           asset_name: Websitetool-darwin-amd64
           asset_content_type: application/octet-stream
@@ -68,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.release_notes.outputs.upload_url }}
           asset_path: ./Websitetool-windows-amd64.exe
           asset_name: Websitetool-windows-amd64.exe
           asset_content_type: application/octet-stream
