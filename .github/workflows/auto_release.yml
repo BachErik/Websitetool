@@ -20,7 +20,6 @@ jobs:
           config-name: release-drafter.yml
           tag: ${{ vars.VERSION }}
           prerelease: ${{ vars.PRERELEASE }}
-          draft: false
 
       - name: Setup Go
         uses: actions/setup-go@v2
