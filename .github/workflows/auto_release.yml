@@ -25,6 +25,7 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o Websitetool-linux-amd64 main.go
           GOOS=darwin GOARCH=amd64 go build -o Websitetool-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o Websitetool-windows-amd64.exe main.go
+
       - name: Create tag
         id: create_tag
         uses: actions/create-release@v1.0.1
@@ -36,11 +37,6 @@ jobs:
           body: Automated release created by GitHub Actions
           draft: true
           prerelease: false
-        # Set the output for the tag name
-        # This will be used as the release tag
-        # in the next step
-        outputs:
-          tag_name: ${{ steps.create_tag.outputs.tag_name }}
 
       - name: Upload Linux binary
         uses: actions/upload-release-asset@v1
