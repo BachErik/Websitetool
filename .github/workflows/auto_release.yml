@@ -36,7 +36,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: Automated release created by GitHub Actions
-          draft: true
+          draft: false
           prerelease: false
 
       - name: Upload Linux binary
