@@ -17,7 +17,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GrapheQL }}
         with:
-          config-name: .github/release-drafter.yml
+          config-name: release-drafter.yml
 
       - name: Create Release
         id: create_release
