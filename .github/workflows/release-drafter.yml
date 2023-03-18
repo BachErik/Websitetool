@@ -1,0 +1,41 @@
+name-template: 'v{{version}}'
+
+categories:
+  - title: 'New Features'
+    labels:
+      - 'feature'
+  - title: 'Bug Fixes'
+    labels:
+      - 'bug'
+
+template: |
+  {{#each categories}}
+  ### {{title}}
+
+  {{#each issues}}
+  - {{#if pull_request}}
+    {{#if pr_labels}}
+      **{{pr_labels}}:** [{{title}}]({{pull_request.url}})
+    {{else}}
+      [{{title}}]({{pull_request.url}})
+    {{/if}}
+    {{else}}
+    {{#if labels}}
+      **{{labels}}:** {{title}}
+    {{else}}
+      {{title}}
+    {{/if}}
+    {{/if}}
+  {{/each}}
+
+  {{/each}}
+
+changelog-filename: CHANGELOG.md
+
+change-template: '- {{title}} (#{{number}})'
+
+ignore:
+  labels:
+    - 'skip-changelog'
+  issues:
+    - '5465465465465465465465465454' # Ignore specific issue by number
