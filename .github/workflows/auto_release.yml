@@ -8,31 +8,37 @@ env:
   GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
 jobs:
-  Generate_Binaries:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Set up Go environment
-      - name: Set up Go
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Go
         uses: actions/setup-go@v2
         with:
           go-version: ^1.16
 
-      # Check out the code
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      # Build the binaries
       - name: Build binaries
         run: |
           GOOS=linux GOARCH=amd64 go build -o Websitetool-linux-amd64 main.go
           GOOS=darwin GOARCH=amd64 go build -o Websitetool-darwin-amd64 main.go
           GOOS=windows GOARCH=amd64 go build -o Websitetool-windows-amd64.exe main.go
 
+      - name: Create tag
+        id: create_tag
+        uses: actions/create-release@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: Automated release created by GitHub Actions
+          draft: false
+          prerelease: false
 
-      # Upload the binaries as release assets
-      - name: Upload release assets
-        id: upload-release-assets
+      - name: Upload Linux binary
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -42,7 +48,7 @@ jobs:
           asset_name: Websitetool-linux-amd64
           asset_content_type: application/octet-stream
 
-      - name: Upload release assets
+      - name: Upload macOS binary
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -52,7 +58,7 @@ jobs:
           asset_name: Websitetool-darwin-amd64
           asset_content_type: application/octet-stream
 
-      - name: Upload release assets
+      - name: Upload Windows binary
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
@@ -63,20 +69,19 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Generate release notes
-        id: release_notes
         uses: release-drafter/release-drafter@v5.21.1
         with:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
           config-path: .github/release-drafter.yml
 
       - name: Create release
-        id: create_release
         uses: actions/create-release@v1.0.1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: ${{ steps.release_notes.outputs.changes }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
