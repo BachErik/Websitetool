@@ -56,7 +56,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./Websitetool-linux-amd64
           asset_name: Websitetool-linux-amd64
           asset_content_type: application/octet-stream
@@ -66,7 +66,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./Websitetool-darwin-amd64
           asset_name: Websitetool-darwin-amd64
           asset_content_type: application/octet-stream
@@ -76,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_tag.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./Websitetool-windows-amd64.exe
           asset_name: Websitetool-windows-amd64.exe
           asset_content_type: application/octet-stream
