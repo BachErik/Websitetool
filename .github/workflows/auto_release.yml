@@ -32,9 +32,8 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-          VERSION: ${{ vars.VERSION }}
         with:
-          tag_name: $VERSION
+          tag_name: ${{ vars.VERSION }}
           release_name: Release ${{ steps.latest_tag.outputs.tag }}
           body: |
             ${{ steps.release_notes.outputs.changes }}
