@@ -8,7 +8,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
 jobs:
-  Generate Binaries:
+  Generate_Binaries:
     runs-on: ubuntu-latest
 
     steps:
