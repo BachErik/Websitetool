@@ -29,14 +29,14 @@ jobs:
       - name: Create tag
         id: create_tag
         uses: actions/create-release@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
           body: Automated release created by GitHub Actions
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
       - name: Upload Linux binary
         uses: actions/upload-release-asset@v1
